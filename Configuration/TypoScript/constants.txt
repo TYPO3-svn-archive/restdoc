@@ -1,0 +1,34 @@
+plugin.tx_restdoc {
+	# Path to the reST documentation
+	path =
+
+	# Name of the default file (without .fjson extension)
+	defaultFile = index
+
+	# mode of the plugin (BODY | TOC | RECENT | TITLE | QUICK_NAVIGATION | BREADCRUMB | FILENAME | SEARCH)
+	mode =
+
+	# UID of page showing the documentation (used when mode = SEARCH to link back to the documentation from search results)
+	rootPage =
+
+	# set it to 1 to show permanent links in sections
+	showPermanentLink = 0
+
+	# separator for the documentation's directory (see http://forge.typo3.org/issues/45560)
+	pathSeparator = |
+
+	# comma-separated list of fallback path separators (see https://forge.typo3.org/issues/46174)
+	fallbackPathSeparators = \
+
+	# maximal number of documents to process at once when generating the documentation's structure
+	documentStructureMaxDocuments = 50
+
+	# whether Sphinx should be advertised (see http://wappalyzer.com/applications/sphinx)
+	advertiseSphinx = 1
+
+	# whether pagination should be generated with rel="next" and rel="prev"
+	addHeadPagination = 1
+
+	# whether sources should be accessible
+	publishSources = 1
+}
