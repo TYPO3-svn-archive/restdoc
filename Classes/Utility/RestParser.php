@@ -65,27 +65,27 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 
 	// Regex to match balanced [brackets].
 	// Needed to insert a maximum bracked depth while converting to PHP.
-	var $nested_brackets_depth = 6;
-	var $nested_brackets_re;
+	protected $nested_brackets_depth = 6;
+	protected $nested_brackets_re;
 
-	var $nested_url_parenthesis_depth = 4;
-	var $nested_url_parenthesis_re;
+	protected $nested_url_parenthesis_depth = 4;
+	protected $nested_url_parenthesis_re;
 
 	// Table of hash values for escaped characters:
-	var $escape_chars = '\`*_{}[]()>#+-.!';
-	var $escape_chars_re;
+	protected $escape_chars = '\`*_{}[]()>#+-.!';
+	protected $escape_chars_re;
 
 	// Change to ">" for HTML output.
-	var $empty_element_suffix = MARKDOWN_EMPTY_ELEMENT_SUFFIX;
-	var $tab_width = MARKDOWN_TAB_WIDTH;
+	protected $empty_element_suffix = MARKDOWN_EMPTY_ELEMENT_SUFFIX;
+	protected $tab_width = MARKDOWN_TAB_WIDTH;
 
 	// Change to `TRUE` to disallow markup or entities.
-	var $no_markup = FALSE;
-	var $no_entities = FALSE;
+	protected $no_markup = FALSE;
+	protected $no_entities = FALSE;
 
 	// Predefined urls and titles for reference links and images.
-	var $predef_urls = array();
-	var $predef_titles = array();
+	protected $predef_urls = array();
+	protected $predef_titles = array();
 
 	/**
 	 * Default constructor.
@@ -111,12 +111,12 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 	}
 
 	// Internal hashes used during transformation.
-	var $urls = array();
-	var $titles = array();
-	var $html_hashes = array();
+	protected $urls = array();
+	protected $titles = array();
+	protected $html_hashes = array();
 
 	// Status flag to avoid invalid nesting.
-	var $in_anchor = false;
+	protected $in_anchor = false;
 
 	/**
 	 * Called before the transformation process starts to setup parser
@@ -205,7 +205,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		return $text . LF;
 	}
 
-	var $document_gamut = array(
+	protected $document_gamut = array(
 		"stripLinkDefinitions" => 20,
 		"runBasicBlockGamut"   => 30,
 	);
@@ -244,7 +244,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 				)?    # title is optional
 				(?:\n+|\Z)
 			}xm',
-			array(&$this, '_stripLinkDefinitions_callback'),
+			array($this, '_stripLinkDefinitions_callback'),
 			$text);
 		return $text;
 	}
@@ -431,7 +431,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		return $this->hashPart($text, 'B');
 	}
 
-	var $block_gamut = array(
+	protected $block_gamut = array(
 		//
 		// These are all the transformations that form block-level
 		// tags like paragraphs, headers, and list items.
@@ -501,7 +501,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 	 * These are all the transformations that occur *within* block-level
 	 * tags like paragraphs, headers, and list items.
 	 */
-	var $span_gamut = array(
+	protected $span_gamut = array(
 		// Process character escapes, code spans, and inline HTML
 		// in one shot.
 		"parseSpan"           => -30,
@@ -538,7 +538,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 	protected function doHardBreaks($text) {
 		// Do hard breaks:
 		return preg_replace_callback('/ {2,}\n/',
-			array(&$this, '_doHardBreaks_callback'), $text);
+			array($this, '_doHardBreaks_callback'), $text);
 	}
 
 	protected function _doHardBreaks_callback($matches) {
@@ -799,7 +799,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		//      --------
 		//
 		$text = preg_replace_callback('{ ^(.+?)[ ]*\n(=+|-+)[ ]*\n+ }mx',
-			array(&$this, '_doHeaders_callback_setext'), $text);
+			array($this, '_doHeaders_callback_setext'), $text);
 
 		return $text;
 	}
@@ -882,7 +882,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 						(?:(?<=\n)\n|\A\n?) # Must eat the newline
 						'.$whole_list_re.'
 					}mx',
-					array(&$this, '_doLists_callback'), $text);
+					array($this, '_doLists_callback'), $text);
 			}
 		}
 
@@ -907,7 +907,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		return "\n". $result ."\n\n";
 	}
 
-	var $list_level = 0;
+	protected $list_level = 0;
 
 	/**
 	 * Processes the contents of a single ordered or unordered list, splitting it
@@ -954,7 +954,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 			(?:(\n+(?=\n))|\n)                # tailing blank line = $5
 			(?= \n* (\z | \2 ('.$marker_any_re.') (?:[ ]+|(?=\n))))
 			}xm',
-			array(&$this, '_processListItems_callback'), $list_str);
+			array($this, '_processListItems_callback'), $list_str);
 
 		$this->list_level--;
 		return $list_str;
@@ -1030,22 +1030,22 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		return $this->hashPart("<code>$code</code>");
 	}
 
-	var $em_relist = array(
+	protected $em_relist = array(
 		''  => '(?:(?<!\*)\*(?!\*)|(?<!_)_(?!_))(?=\S|$)(?![.,:;]\s)',
 		'*' => '(?<=\S|^)(?<!\*)\*(?!\*)',
 		'_' => '(?<=\S|^)(?<!_)_(?!_)',
 		);
-	var $strong_relist = array(
+	protected $strong_relist = array(
 		''   => '(?:(?<!\*)\*\*(?!\*)|(?<!_)__(?!_))(?=\S|$)(?![.,:;]\s)',
 		'**' => '(?<=\S|^)(?<!\*)\*\*(?!\*)',
 		'__' => '(?<=\S|^)(?<!_)__(?!_)',
 		);
-	var $em_strong_relist = array(
+	protected $em_strong_relist = array(
 		''    => '(?:(?<!\*)\*\*\*(?!\*)|(?<!_)___(?!_))(?=\S|$)(?![.,:;]\s)',
 		'***' => '(?<=\S|^)(?<!\*)\*\*\*(?!\*)',
 		'___' => '(?<=\S|^)(?<!_)___(?!_)',
 		);
-	var $em_strong_prepared_relist;
+	protected $em_strong_prepared_relist;
 
 	/**
 	 * Prepares regular expressions for searching emphasis tokens in any
@@ -1219,9 +1219,9 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		// These leading spaces cause problem with <pre> content,
 		// so we need to fix that:
 		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-			array(&$this, '_doBlockQuotes_callback2'), $bq);
+			array($this, '_doBlockQuotes_callback2'), $bq);
 
-		return "\n". $this->hashBlock("<blockquote>\n$bq\n</blockquote>")."\n\n";
+		return LF. $this->hashBlock("<blockquote>\n$bq\n</blockquote>") . LF . LF;
 	}
 
 	protected function _doBlockQuotes_callback2($matches) {
@@ -1304,7 +1304,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 
 	protected function doAutoLinks($text) {
 		$text = preg_replace_callback('{<((https?|ftp|dict):[^\'">\s]+)>}i',
-			array(&$this, '_doAutoLinks_url_callback'), $text);
+			array($this, '_doAutoLinks_url_callback'), $text);
 
 		// Email addresses: <address@domain.foo>
 		$text = preg_replace_callback('{
@@ -1325,7 +1325,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 			)
 			>
 			}xi',
-			array(&$this, '_doAutoLinks_email_callback'), $text);
+			array($this, '_doAutoLinks_email_callback'), $text);
 
 		return $text;
 	}
@@ -1484,8 +1484,8 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 	}
 
 	// String length function for detab. `_initDetab` will create a function to
-	// hanlde UTF-8 if the default function does not exist.
-	var $utf8_strlen = 'mb_strlen';
+	// handle UTF-8 if the default function does not exist.
+	protected $utf8_strlen = 'mb_strlen';
 
 	/**
 	 * Replaces tabs with the appropriate amount of space.
@@ -1499,7 +1499,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 		// appropriate number of space between each blocks.
 
 		$text = preg_replace_callback('/^.*\t.*$/m',
-			array(&$this, '_detab_callback'), $text);
+			array($this, '_detab_callback'), $text);
 
 		return $text;
 	}
@@ -1546,7 +1546,7 @@ class Tx_Restdoc_Utility_RestParser implements t3lib_Singleton {
 	 */
 	protected function unhash($text) {
 		return preg_replace_callback('/(.)\x1A[0-9]+\1/',
-			array(&$this, '_unhash_callback'), $text);
+			array($this, '_unhash_callback'), $text);
 	}
 
 	protected function _unhash_callback($matches) {
